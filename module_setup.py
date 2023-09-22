@@ -18,9 +18,8 @@ global_model_card = (train_info_args["model_name_or_path"] or train_info_args["c
 global_model_card = global_model_card.split('/')[-1].lower() if os.path.isdir(global_model_card) else \
     str(os.path.dirname(global_model_card)).split('/')[-1].lower()
 
-def module_setup():
 
-    # register_transformer_config(XverseConfig)
+def module_setup():
     register_transformer_model(LlamaForCausalLM, AutoModelForCausalLM)
 
     if "baichuan" in global_model_card:
@@ -109,4 +108,27 @@ def module_setup():
         register_transformer_config(ChatGLMConfig)
         register_transformer_model(LM_MODEL, AutoModelForCausalLM)
         register_transformer_tokenizer(ChatGLMConfig, ChatGLMTokenizer, ChatGLMTokenizer)
+
+    elif "moss" in global_model_card:
+        from aigc_zoo.model_zoo.moss.llm_model import (MyMossForCausalLM as LM_MODEL,
+                                                      PetlArguments,  # noqa
+                                                      LoraConfig, PetlModel,
+                                                      PromptArguments,
+                                                      MossConfig, MossTokenizer)
+
+        register_transformer_config(MossConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(MossConfig, MossTokenizer, MossTokenizer)
+    elif "rwkv" in global_model_card:
+        from aigc_zoo.model_zoo.rwkv4.llm_model import (MyRwkvForCausalLM as LM_MODEL,
+                                                       PetlArguments,  # noqa
+                                                       LoraConfig, PetlModel,
+                                                       PromptArguments,
+                                                       RwkvConfig)
+        register_transformer_config(RwkvConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        if 'world' in global_model_card:
+            from aigc_zoo.model_zoo.rwkv4.rwkv4_tokenizer import RWKVTokenizer
+            register_transformer_tokenizer(RwkvConfig, RWKVTokenizer, RWKVTokenizer)
+
     # 按需加入其他自定义模型

@@ -6,6 +6,27 @@
 ## update information
    - [deep_training](https://github.com/ssbuild/deep_training)
 
+## 支持训练方式
+
+| 模型        | 32精度 | 混合精度 | 16精度 | lora int8 | lora int4 | ptv2   |
+|-----------|-------|---------|-------|-----------|-----------|--------|
+| llama     | √    | √    | √    | √         | √         | ×      |
+| llama2    | √    | √    | √    | √         | √         | ×      |
+| chatglm   | √    | √    | √    | √         | √         | ×      |
+| chatglm2  | √    | √    | √    | √         | √         | ×      |
+| baichuan  | √    | √    | √    | √         | √         | ×      |
+| baichuan2 | √    | √    | √    | √         | √         | ×      |
+| opt       | √    | √    | √    | √         | √         | ×      |
+| moss      | √    | √    | √    | √         | √         | ×      |
+| rwkv      | √    | √    | √    | √         | √         | ×      |
+| tiger     | √    | √    | √    | √         | √         | ×      |
+| qwen      | √    | √    | √    | √         | √         | ×      |
+| internlm  | √    | √    | √    | √         | √         | ×      |
+| gpt2      | √    | √    | √    | √         | √         | ×      |
+| xverse    | √    | √    | √    | √         | √         | ×      |
+| openbuddy | √    | √    | √    | √         | √         | ×      |
+
+
 ## 数据示例
 ```json
 {

@@ -30,7 +30,6 @@ if global_args['quantization_config'] is not None:
 if enable_lora:
     enable_ptv2 = False
 
-
     #检查lora adalora是否开启
     if 'lora' not in train_info_args and 'adalora' not in train_info_args:
         raise ValueError('please config lora or adalora')
@@ -44,7 +43,7 @@ else:
     train_info_args.pop('prompt', None)
 
 #预处理
-if 'rwkv' in train_info_args['tokenizer_name'].lower():
+if 'rwkv' in (train_info_args['model_name_or_path'] or train_info_args['tokenizer_name']).lower():
     train_info_args['use_fast_tokenizer'] = True
 
 
@@ -53,7 +52,7 @@ if 'rwkv' in train_info_args['tokenizer_name'].lower():
 def get_deepspeed_config(precision="fp16"):
     '''
         lora prompt finetuning 使用 deepspeed_offload.json
-        普通finetuning 使用deepspeed.json
+        普通  finetuning        使用deepspeed.json
     '''
     # 是否开启deepspeed
     if not enable_deepspeed:
@@ -88,7 +87,8 @@ def get_deepspeed_config(precision="fp16"):
             deepspeed_config["bf16"]["enbale"] = True
         else:
             deepspeed_config['bf16'] = {"enbale": True}
-    elif precision == 'fp16':
+    elif precision == '16':
         if 'bf16' in deepspeed_config:
             deepspeed_config["bf16"]["enbale"] = False
+
     return deepspeed_config

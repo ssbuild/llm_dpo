@@ -7,7 +7,7 @@ import torch
 from deep_training.data_helper import ModelArguments
 from transformers import HfArgumentParser,AutoConfig,PreTrainedTokenizer
 from data_utils import train_info_args, NN_DataHelper
-from aigc_zoo.model_zoo.llm.llm_model import MyTransformer
+from aigc_zoo.model_zoo.auto.llm_model import MyTransformer
 
 deep_config = get_deepspeed_config()
 

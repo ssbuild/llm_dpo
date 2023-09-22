@@ -12,6 +12,7 @@ from transformers import HfArgumentParser
 from data_utils import NN_DataHelper, train_info_args, global_args, get_deepspeed_config
 from aigc_zoo.model_zoo.auto.dpo_model import MyTransformerDPO,PetlArguments, LoraConfig
 
+from module_setup import global_model_card
 
 if __name__ == '__main__':
     parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, PetlArguments))
@@ -38,6 +39,17 @@ if __name__ == '__main__':
 
     if global_args["quantization_config"] is not None and global_args["quantization_config"].load_in_8bit:
         precision = "32"
+
+    if 'rwkv' in global_model_card:
+        if precision.startswith('16'):
+            RWKV_FLOAT_MODE = '16'
+        elif precision.startswith('bf16'):
+            RWKV_FLOAT_MODE = 'bf16'
+        else:
+            RWKV_FLOAT_MODE = '32'
+        from deep_training.nlp.models.rwkv4.modeling_rwkv import set_model_profile
+        # 加载cuda_core
+        set_model_profile(RWKV_T_MAX=config.ctx_len, RWKV_FLOAT_MODE=RWKV_FLOAT_MODE)
 
     deepspeed_config = get_deepspeed_config(precision)
     strategy = 'ddp' if torch.cuda.device_count() > 1 else 'auto'

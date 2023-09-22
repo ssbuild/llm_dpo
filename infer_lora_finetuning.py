@@ -7,7 +7,7 @@ import torch
 from deep_training.data_helper import ModelArguments, DataArguments
 from transformers import HfArgumentParser,AutoConfig,PreTrainedTokenizer
 from data_utils import train_info_args, NN_DataHelper
-from aigc_zoo.model_zoo.auto.dpo_model import MyTransformerDPO,PetlArguments
+from aigc_zoo.model_zoo.auto.llm_model import MyTransformer,PetlArguments
 
 if __name__ == '__main__':
     train_info_args['seed'] = None
@@ -28,7 +28,7 @@ if __name__ == '__main__':
     if config.task_specific_params is not None and config.task_specific_params.get('vocab_size', None) is not None:
         config.vocab_size = config.task_specific_params['vocab_size']
 
-    pl_model = MyTransformerDPO(config=config, model_args=model_args, lora_args=lora_args,
+    pl_model = MyTransformer(config=config, model_args=model_args, lora_args=lora_args,
                                    torch_dtype=config.torch_dtype,
                                    new_num_tokens=new_num_tokens,
                                    

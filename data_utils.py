@@ -9,10 +9,10 @@ import typing
 import numpy as np
 import torch
 from deep_training.data_helper import DataHelper, ModelArguments, TrainingArguments, DataArguments
-from aigc_zoo.model_zoo.llm.dpo_model import PetlArguments,LoraConfig
+from aigc_zoo.model_zoo.auto.dpo_model import PetlArguments,LoraConfig
 from fastdatasets.record import load_dataset as Loader, RECORD, WriterObject, gfile
 from transformers import PreTrainedTokenizer, HfArgumentParser, PretrainedConfig
-from data_processer import DEFAULT_EOS_TOKEN, DEFAULT_BOS_TOKEN, DEFAULT_UNK_TOKEN, CorpusPreprocess, TokenIds
+from data_processer import DEFAULT_EOS_TOKEN, DEFAULT_BOS_TOKEN, DEFAULT_UNK_TOKEN, CorpusPreprocess, TokenIdsMaker
 from config import *
 from torch.nn import functional as F
 
@@ -76,7 +76,7 @@ class NN_DataHelper(DataHelper):
         tokenizer = self.tokenizer
 
         pair_data = data
-        d = TokenIds.process(pair_data,tokenizer,max_seq_length)
+        d = TokenIdsMaker.process(pair_data, tokenizer, max_seq_length)
         if self.index < 3:
             print(d)
         return d

@@ -36,11 +36,53 @@ train_info_models = {
         'config_name': '/data/nlp/pre_models/torch/llama/llama-7b-hf/config.json',
         'tokenizer_name': '/data/nlp/pre_models/torch/llama/llama-7b-hf',
     },
-    'rwkv-4-430m-pile': {
-        'model_type': 'rwkv',
-        'model_name_or_path': '/data/nlp/pre_models/torch/rwkv/rwkv-4-430m-pile',
-        'config_name': '/data/nlp/pre_models/torch/rwkv/rwkv-4-430m-pile/config.json',
-        'tokenizer_name': '/data/nlp/pre_models/torch/rwkv/rwkv-4-430m-pile',
+
+    'Qwen-7B-Chat': {
+        'model_type': 'qwen',
+        'model_name_or_path': '/data/nlp/pre_models/torch/qwen/Qwen-7B-Chat',
+        'config_name': '/data/nlp/pre_models/torch/qwen/Qwen-7B-Chat/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/qwen/Qwen-7B-Chat/',
+    },
+
+    'Baichuan2-7B-Chat': {
+        'model_type': 'baichuan',
+        'model_name_or_path': '/data/nlp/pre_models/torch/baichuan2/Baichuan2-7B-Chat',
+        'config_name': '/data/nlp/pre_models/torch/baichuan2/Baichuan2-7B-Chat/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/baichuan2/Baichuan2-7B-Chat',
+    },
+
+    'Baichuan2-13B-Chat': {
+        'model_type': 'baichuan',
+        'model_name_or_path': '/data/nlp/pre_models/torch/baichuan2/Baichuan2-13B-Chat',
+        'config_name': '/data/nlp/pre_models/torch/baichuan2/Baichuan2-13B-Chat/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/baichuan2/Baichuan2-13B-Chat',
+    },
+
+    'Baichuan-13B-Chat': {
+        'model_type': 'baichuan',
+        'model_name_or_path': '/data/nlp/pre_models/torch/baichuan/Baichuan-13B-Chat',
+        'config_name': '/data/nlp/pre_models/torch/baichuan/Baichuan-13B-Chat/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/baichuan/Baichuan-13B-Chat',
+    },
+
+    'XVERSE-13B-Chat': {
+        'model_type': 'xverse',
+        'model_name_or_path': '/data/nlp/pre_models/torch/xverse/XVERSE-13B-Chat',
+        'config_name': '/data/nlp/pre_models/torch/xverse/XVERSE-13B-Chat/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/xverse/XVERSE-13B-Chat',
+    },
+
+    'internlm-chat-7b': {
+        'model_type': 'internlm',
+        'model_name_or_path': '/data/nlp/pre_models/torch/internlm/internlm-chat-7b',
+        'config_name': '/data/nlp/pre_models/torch/internlm/internlm-chat-7b/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/internlm/internlm-chat-7b',
+    },
+    'internlm-chat-7b-8k': {
+        'model_type': 'internlm',
+        'model_name_or_path': '/data/nlp/pre_models/torch/internlm/internlm-chat-7b-8k',
+        'config_name': '/data/nlp/pre_models/torch/internlm/internlm-chat-7b-8k/config.json',
+        'tokenizer_name': '/data/nlp/pre_models/torch/internlm/internlm-chat-7b-8k',
     },
 }
 
@@ -61,3 +103,5 @@ train_target_modules_maps = {
     'cpmant' : ['project_q','project_v'],
     'rwkv' : ['key','value','receptance'],
 }
+
+train_model_config = train_info_models['opt-350m']

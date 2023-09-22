@@ -10,7 +10,7 @@ from lightning.pytorch.callbacks import ModelCheckpoint, LearningRateMonitor
 from lightning.pytorch.strategies import DeepSpeedStrategy
 from transformers import HfArgumentParser
 from data_utils import NN_DataHelper, train_info_args, global_args, get_deepspeed_config
-from aigc_zoo.model_zoo.llm.dpo_model import MyTransformerDPO,PetlArguments, LoraConfig
+from aigc_zoo.model_zoo.auto.dpo_model import MyTransformerDPO,PetlArguments, LoraConfig
 
 
 if __name__ == '__main__':

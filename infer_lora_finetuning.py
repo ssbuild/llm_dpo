@@ -7,7 +7,7 @@ import torch
 from deep_training.data_helper import ModelArguments, DataArguments
 from transformers import HfArgumentParser,AutoConfig,PreTrainedTokenizer
 from data_utils import train_info_args, NN_DataHelper
-from aigc_zoo.model_zoo.llm.dpo_model import MyTransformerDPO,PetlArguments
+from aigc_zoo.model_zoo.auto.dpo_model import MyTransformerDPO,PetlArguments
 
 if __name__ == '__main__':
     train_info_args['seed'] = None

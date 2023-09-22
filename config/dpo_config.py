@@ -2,10 +2,7 @@
 # @Time    : 2023/5/7 17:28
 # @Author  : tk
 # @FileName: reward_config
-from config.constant_map import train_info_models
-
-train_model_config = train_info_models['opt-350m']
-
+from config.constant_map import train_info_models, train_model_config
 
 global_args = {
 

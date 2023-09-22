@@ -3,49 +3,110 @@
 # @Time    : 2023/9/19 16:22
 
 import os
-from deep_training.utils.hf import register_transformer_model,register_transformer_config
-from config import *
-
-_model_card = (train_info_args["model_name_or_path"] or train_info_args["config_name"])
-_model_card = _model_card.split('/')[-1].lower() if os.path.isdir(_model_card) else str(os.path.dirname(_model_card)).split('/')[-1].lower()
-
-#支持自定义hf中文模型载入
-if "baichuan2" in _model_card:
-    if "7b" in _model_card:
-        from aigc_zoo.model_zoo.baichuan.baichuan2_7b.llm_model import (MyTransformer,PetlArguments, # noqa
-                                                                        LoraConfig,PetlModel,
-                                                                        PromptArguments,
-                                                                        BaichuanConfig,
-                                                                        BaichuanTokenizer)
-    else:
-        from aigc_zoo.model_zoo.baichuan.baichuan2_13b.llm_model import (MyTransformer, PetlArguments, # noqa
-                                                                        LoraConfig,PetlModel,
-                                                                        PromptArguments,
-                                                                        BaichuanConfig,
-                                                                        BaichuanTokenizer)
-
-elif "baichuan" in _model_card:
-    if "7b" in _model_card:
-        from aigc_zoo.model_zoo.baichuan.baichuan_7b.llm_model import (MyTransformer, PetlArguments,  # noqa
-                                                                        LoraConfig, PetlModel,
-                                                                        PromptArguments,
-                                                                        BaichuanConfig,
-                                                                        BaichuanTokenizer)
-    else:
-        from aigc_zoo.model_zoo.baichuan.baichuan_13b.llm_model import (MyTransformer, PetlArguments,  # noqa
-                                                                         LoraConfig, PetlModel,
-                                                                         PromptArguments,
-                                                                         BaichuanConfig,
-                                                                         BaichuanTokenizer)
-
-del _model_card
+from deep_training.utils.hf import register_transformer_model, register_transformer_config, \
+    register_transformer_tokenizer
+from transformers import AutoModelForCausalLM
+from deep_training.nlp.models.rellama.modeling_llama import LlamaForCausalLM
+from config import train_info_args
 
 __all__ = [
-    "module_setup"
+    "module_setup",
+    "global_model_card"
 ]
 
+global_model_card = (train_info_args["model_name_or_path"] or train_info_args["config_name"])
+global_model_card = global_model_card.split('/')[-1].lower() if os.path.isdir(global_model_card) else \
+    str(os.path.dirname(global_model_card)).split('/')[-1].lower()
+
 def module_setup():
-    pass
-    # 导入模型
-    #register_transformer_config(XverseConfig)
-    # register_transformer_model(LlamaForCausalLM, AutoModelForCausalLM)
+
+    # register_transformer_config(XverseConfig)
+    register_transformer_model(LlamaForCausalLM, AutoModelForCausalLM)
+
+    if "baichuan" in global_model_card:
+        assert "7b" in global_model_card or "13b" in global_model_card
+        if "baichuan2" in global_model_card:
+            if "7b" in global_model_card:
+                from aigc_zoo.model_zoo.baichuan.baichuan2_7b.llm_model import (MyBaichuanForCausalLM as LM_MODEL, PetlArguments,  # noqa
+                                                                                LoraConfig, PetlModel,
+                                                                                PromptArguments,
+                                                                                BaichuanConfig,
+                                                                                BaichuanTokenizer)
+            else:
+                from aigc_zoo.model_zoo.baichuan.baichuan2_13b.llm_model import (MyBaichuanForCausalLM as LM_MODEL, PetlArguments,  # noqa
+                                                                                 LoraConfig, PetlModel,
+                                                                                 PromptArguments,
+                                                                                 BaichuanConfig,
+                                                                                 BaichuanTokenizer)
+        else:
+            if "7b" in global_model_card:
+                from aigc_zoo.model_zoo.baichuan.baichuan_7b.llm_model import (MyBaichuanForCausalLM as LM_MODEL, PetlArguments,  # noqa
+                                                                               LoraConfig, PetlModel,
+                                                                               PromptArguments,
+                                                                               BaichuanConfig,
+                                                                               BaichuanTokenizer)
+            else:
+                from aigc_zoo.model_zoo.baichuan.baichuan_13b.llm_model import (MyBaichuanForCausalLM as LM_MODEL, PetlArguments,  # noqa
+                                                                                LoraConfig, PetlModel,
+                                                                                PromptArguments,
+                                                                                BaichuanConfig,
+                                                                                BaichuanTokenizer)
+
+        register_transformer_config(BaichuanConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(BaichuanConfig,BaichuanTokenizer,BaichuanTokenizer)
+
+    elif "xverse" in global_model_card:
+        from aigc_zoo.model_zoo.xverse.llm_model import (MyXverseForCausalLM as LM_MODEL,
+                                                        PetlArguments,  # noqa
+                                                        LoraConfig, PetlModel,
+                                                        PromptArguments,
+                                                        XverseConfig,)
+
+        register_transformer_config(XverseConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+
+    elif "qwen" in global_model_card:
+        from aigc_zoo.model_zoo.qwen.llm_model import (MyQWenLMHeadModel as LM_MODEL,
+                                                     PetlArguments,  # noqa
+                                                     LoraConfig, PetlModel,
+                                                     PromptArguments,
+                                                     QWenConfig,QWenTokenizer )
+
+        register_transformer_config(QWenConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(QWenConfig, QWenTokenizer, QWenTokenizer)
+
+    elif "internlm" in global_model_card:
+        from aigc_zoo.model_zoo.internlm.llm_model import (MyInternLMForCausalLM as LM_MODEL,
+                                                     PetlArguments,  # noqa
+                                                     LoraConfig, PetlModel,
+                                                     PromptArguments,
+                                                     InternLMConfig,InternLMTokenizer )
+
+        register_transformer_config(InternLMConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(InternLMConfig, InternLMTokenizer, InternLMTokenizer)
+
+    elif "chatglm2" in global_model_card:
+        from aigc_zoo.model_zoo.chatglm2.llm_model import (MyChatGLMForConditionalGeneration as LM_MODEL,
+                                                           PetlArguments,  # noqa
+                                                           LoraConfig, PetlModel,
+                                                           PromptArguments,
+                                                           ChatGLMConfig, ChatGLMTokenizer)
+
+        register_transformer_config(ChatGLMConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(ChatGLMConfig, ChatGLMTokenizer, ChatGLMTokenizer)
+
+    elif "chatglm" in global_model_card:
+        from aigc_zoo.model_zoo.chatglm.llm_model import (MyChatGLMForConditionalGeneration as LM_MODEL,
+                                                           PetlArguments,  # noqa
+                                                           LoraConfig, PetlModel,
+                                                           PromptArguments,
+                                                           ChatGLMConfig, ChatGLMTokenizer)
+
+        register_transformer_config(ChatGLMConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(ChatGLMConfig, ChatGLMTokenizer, ChatGLMTokenizer)
+    # 按需加入其他自定义模型

@@ -5,10 +5,7 @@
 
 import torch
 from transformers import BitsAndBytesConfig
-from config.constant_map import train_info_models, train_target_modules_maps
-
-train_model_config = train_info_models['opt-350m']
-
+from config.constant_map import train_info_models, train_target_modules_maps, train_model_config
 
 global_args = {
     "quantization_config": BitsAndBytesConfig(

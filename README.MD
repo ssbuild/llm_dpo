@@ -1,5 +1,6 @@
 
 ```text
+    09-26 support transformers trainer
     09-15 支持transformers系列模型 dpo训练  
 ```
 

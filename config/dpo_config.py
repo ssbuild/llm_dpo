@@ -1,7 +1,7 @@
 # coding=utf8
 # @Time    : 2023/5/7 17:28
 # @Author  : tk
-from config.constant_map import train_info_models, train_model_config
+from config.constant_map import train_model_config
 
 
 

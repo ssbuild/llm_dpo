@@ -63,21 +63,10 @@ train_info_models = {
 }
 
 
-# 'target_modules': ['query_key_value'],  # bloom,gpt_neox
-# 'target_modules': ["q_proj", "v_proj"], #llama,opt,gptj,gpt_neo
-# 'target_modules': ['c_attn'], #gpt2
-# 'target_modules': ['project_q','project_v'] # cpmant
-
-train_target_modules_maps = {
-    'bloom' : ['query_key_value'],
-    'gpt_neox' : ['query_key_value'],
-    'llama' : ["q_proj", "v_proj"],
-    'opt' : ["q_proj", "v_proj"],
-    'gptj' : ["q_proj", "v_proj"],
-    'gpt_neo' : ["q_proj", "v_proj"],
-    'gpt2' : ['c_attn'],
-    'cpmant' : ['project_q','project_v'],
-    'rwkv' : ['key','value','receptance'],
-}
+# 按需修改
+# TRANSFORMERS_MODELS_TO_LORA_TARGET_MODULES_MAPPING
+# TRANSFORMERS_MODELS_TO_ADALORA_TARGET_MODULES_MAPPING
+# TRANSFORMERS_MODELS_TO_IA3_TARGET_MODULES_MAPPING
+# TRANSFORMERS_MODELS_TO_IA3_FEEDFORWARD_MODULES_MAPPING
 
 train_model_config = train_info_models['opt-350m']

@@ -23,6 +23,8 @@ from data_utils import NN_DataHelper, train_info_args, get_deepspeed_config, glo
 from aigc_zoo.model_zoo.auto.dpo_model import MyTransformerDPO,PetlArguments, LoraConfig
 from deep_training.data_helper import ModelArguments, DataArguments,TrainingArgumentsCL
 
+from module_setup import global_model_card
+
 assert global_args["trainer_backend"] == "cl"
 
 # Will error if the minimal version of Transformers is not installed. Remove at your own risks.
@@ -80,6 +82,16 @@ def main():
         training_args.fp16 = False
         training_args.bf16 = False
 
+    if 'rwkv' in global_model_card:
+        if precision.startswith('16'):
+            RWKV_FLOAT_MODE = '16'
+        elif precision.startswith('bf16'):
+            RWKV_FLOAT_MODE = 'bf16'
+        else:
+            RWKV_FLOAT_MODE = '32'
+        from deep_training.nlp.models.rwkv4.modeling_rwkv import set_model_profile
+        # 加载cuda_core
+        set_model_profile(RWKV_T_MAX=config.ctx_len, RWKV_FLOAT_MODE=RWKV_FLOAT_MODE)
 
     # Log on each process the small summary:
     logger.warning(

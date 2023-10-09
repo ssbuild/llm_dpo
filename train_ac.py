@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 # @Author  : ssbuild
 # @Time    : 2023/9/25 12:29
-
-
+import copy
 import logging
 import math
 import os
@@ -141,6 +140,12 @@ def main():
         transformer_args.pop("device_map")
 
     pl_model = MyTransformerDPO(**transformer_args)
+
+    pl_ref_model = copy.deepcopy(pl_model)
+    pl_ref_model = pl_ref_model.eval().half()
+    pl_ref_model.requires_grad_(False)
+
+    pl_model.backbone.set_ref_model(pl_ref_model)
 
     config.save_pretrained(training_args.output_dir)
 

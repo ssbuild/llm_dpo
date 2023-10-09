@@ -118,12 +118,13 @@ def main():
     # Set seed before initializing model.
     set_seed(training_args.seed)
 
-
+    dpo_args = dict(beta=0.1, ref_free=False)
     transformer_args = dict(config=config, model_args=model_args, training_args=training_args, lora_args=lora_args,
                             quantization_config=global_args["quantization_config"],
                             device_map={"": local_rank} if world_size > 1 else "auto",
                             torch_dtype=torch.float16,
                             new_num_tokens=len(tokenizer),  # 可能扩充词
+                            **dpo_args
                             )
 
     if transformer_args["quantization_config"] is None:

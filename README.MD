@@ -1,5 +1,6 @@
 
 ```text
+    10-09 support accelerator trainer
     10-07 support colossalai trainer
     09-26 support transformers trainer
     09-15 支持transformers系列模型 dpo训练  
@@ -66,12 +67,13 @@
     python train.py
     
     #hf 训练
-    python -m torch.distributed.launch --nproc_per_node=1 train_hf.py
+    torchrun --nproc_per_node=1 train_hf.py
     
     # 多机多卡
-    python -m torch.distributed.launch --nproc_per_node=1 --node_rank $NODE_RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT train_hf.py
+    torchrun --nproc_per_node=1 --node_rank $NODE_RANK --master_addr $MASTER_ADDR --master_port $MASTER_PORT train_hf.py
 
-   
+    # ac 训练  参照 hf训练
+    
     # colossalai 训练 
     colossalai run --nproc_per_node 1 --num_nodes 1 train_cl.py
 ```

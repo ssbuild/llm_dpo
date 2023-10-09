@@ -110,9 +110,9 @@ class TokenIdsMakerForchatglm:
         prompt, chosen, rejected = pair_data
 
 
-        a_ids = tokenizer.encode(prompt, truncation=True, max_length=max_seq_length)
-        b_ids1 = tokenizer.encode(chosen, truncation=True, max_length=max_seq_length)
-        b_ids2 = tokenizer.encode(rejected, truncation=True, max_length=max_seq_length)
+        a_ids = tokenizer.encode(prompt, truncation=True, max_length=max_seq_length,add_special_tokens=False)
+        b_ids1 = tokenizer.encode(chosen, truncation=True, max_length=max_seq_length,add_special_tokens=False)
+        b_ids2 = tokenizer.encode(rejected, truncation=True, max_length=max_seq_length,add_special_tokens=False)
 
         input_ids_a = np.asarray(cls.trunction_ids(a_ids,b_ids1,max_seq_length-1,mode="left",a_min_length=10) + [tokenizer.eos_token_id] ,
                                  dtype=np.int32)

@@ -77,8 +77,8 @@ class TokenIdsMaker:
             if np.all(input_ids_a == input_ids_b):
                 return None
 
-        pos_a = len(a_ids1)
-        pos_b = len(a_ids2)
+        pos_a = len(a_ids1) + len(sptoken)
+        pos_b = len(a_ids2) + len(sptoken)
         assert pos_a >= 0 and pos_a < max_seq_length - 1 and pos_b >= 0 and pos_b < max_seq_length - 1
         labels = np.asarray([-100] * pos_a + input_ids_a[pos_a:].tolist(), dtype=np.int64)
         labels2 = np.asarray([-100] * pos_b + input_ids_b[pos_b:].tolist(), dtype=np.int64)
@@ -184,8 +184,8 @@ class TokenIdsMakerForGLM2(TokenIdsMaker):
         input_ids_b = np.asarray( sptoken + a_ids2 + b_ids2 + [tokenizer.eos_token_id] ,dtype=np.int32)
 
 
-        seqlen_a = len(input_ids_a)
-        seqlen_b = len(input_ids_b)
+        seqlen_a = len(input_ids_a) + len(sptoken)
+        seqlen_b = len(input_ids_b) + len(sptoken)
 
         if seqlen_a == seqlen_b:
             if np.all(input_ids_a == input_ids_b):

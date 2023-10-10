@@ -196,7 +196,7 @@ train_info_args_colossalai = {
 
 
 train_info_args_ac = {
-    'data_backend': 'parquet',  #one of record lmdb arrow_stream arrow_file,parquet, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
+    'data_backend': 'record',  #one of record lmdb arrow_stream arrow_file,parquet, 超大数据集可以使用 lmdb , 注 lmdb 存储空间比record大
     # 预训练模型配置
     **train_model_config,
 

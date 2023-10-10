@@ -16,6 +16,13 @@ from data_factory.data_processer import DEFAULT_EOS_TOKEN, DEFAULT_BOS_TOKEN, DE
 from config import *
 from torch.nn import functional as F
 
+
+data_conf = {
+    "src_max_length": None,
+    "dst_max_length": None,
+}
+
+
 def preprocess(text):
   return text
 
@@ -76,7 +83,9 @@ class NN_DataHelper_Base(DataHelper):
         tokenizer = self.tokenizer
 
         pair_data = data
-        d = TokenIdsMaker.process(pair_data, tokenizer, max_seq_length)
+
+        data_conf["sptoken"] = [config.bos_token_id]
+        d = TokenIdsMaker.process(pair_data, tokenizer, max_seq_length,**data_conf)
         if self.index < 3:
             print(d)
         return d

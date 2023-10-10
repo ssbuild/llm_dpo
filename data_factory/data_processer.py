@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/4/20 8:32
+import copy
 import json
 import typing
 import numpy as np
@@ -34,35 +35,40 @@ class CorpusPreprocess:
 
 class TokenIdsMaker:
     @classmethod
-    def trunction_ids(cls,a_ids: typing.List,b_ids: typing.List,max_seq_length,mode='left',a_min_length=10):
-        assert a_min_length < max_seq_length
-        a_len = max(a_min_length,max_seq_length - len(b_ids))
-        ids = a_ids[:a_len] + b_ids if mode == 'left' else a_ids + b_ids
-        return ids[:max_seq_length]
-    @classmethod
-    def get_prompt_length(cls,a_ids,b_ids):
-        l = min(len(a_ids), len(b_ids))
-        mask: np.ndarray = a_ids[:l] == b_ids[:l]
-        if mask.all():
-            return l
-        return mask.tolist().index(0)
+    def trunction_ids(cls,a_ids: typing.List,b_ids: typing.List,max_seq_length,sptoken):
+        while len(a_ids) + len(b_ids) > max_seq_length - len(sptoken) - 1:
+            if len(a_ids) > len(b_ids):
+                a_ids.pop(0)
+            else:
+                b_ids.pop(-1)
 
     @classmethod
-    def process(cls,pair_data,tokenizer: PreTrainedTokenizer,max_seq_length: int):
+    def process(cls, pair_data, tokenizer: PreTrainedTokenizer, sptoken, max_seq_length: int, src_max_length,
+                dst_max_length):
         prompt, chosen, rejected = pair_data
 
+        a_ids = tokenizer.encode(prompt, truncation=True, max_length=max_seq_length, add_special_tokens=False)
+        b_ids1 = tokenizer.encode(chosen, truncation=True, max_length=max_seq_length, add_special_tokens=False)
+        b_ids2 = tokenizer.encode(rejected, truncation=True, max_length=max_seq_length, add_special_tokens=False)
 
-        a_ids = tokenizer.encode(prompt, truncation=True, max_length=max_seq_length)
-        b_ids1 = tokenizer.encode(chosen, truncation=True, max_length=max_seq_length)
-        b_ids2 = tokenizer.encode(rejected, truncation=True, max_length=max_seq_length)
+        if src_max_length is not None and src_max_length > 0:
+            a_ids = a_ids[:src_max_length]
 
-        input_ids_a = np.asarray(cls.trunction_ids(a_ids,b_ids1,max_seq_length-1,mode="left",a_min_length=10) + [tokenizer.eos_token_id] ,
-                                 dtype=np.int32)
-        attention_mask_a = np.asarray([1] * len(input_ids_a),dtype=np.int32)
+        if dst_max_length is not None and dst_max_length > 0:
+            b_ids1 = b_ids1[:dst_max_length]
+            b_ids2 = b_ids2[:dst_max_length]
 
-        input_ids_b = np.asarray(cls.trunction_ids(a_ids,b_ids2,max_seq_length-1,mode="left",a_min_length=10) + [tokenizer.eos_token_id] ,
-                                 dtype=np.int32)
-        attention_mask_b = np.asarray([1] * len(input_ids_b),dtype=np.int32)
+        a_ids1 = copy.deepcopy(a_ids)
+        cls.trunction_ids(a_ids1, b_ids1, max_seq_length, sptoken)
+
+        a_ids2 = copy.deepcopy(a_ids)
+        cls.trunction_ids(a_ids2, b_ids2, max_seq_length, sptoken)
+
+        input_ids_a = np.asarray(sptoken + a_ids1 + b_ids1 + [tokenizer.eos_token_id], dtype=np.int32)
+        attention_mask_a = np.asarray([1] * len(input_ids_a), dtype=np.int32)
+
+        input_ids_b = np.asarray(sptoken + a_ids2 + b_ids2 + [tokenizer.eos_token_id], dtype=np.int32)
+        attention_mask_b = np.asarray([1] * len(input_ids_b), dtype=np.int32)
 
         seqlen_a = len(input_ids_a)
         seqlen_b = len(input_ids_b)
@@ -70,12 +76,12 @@ class TokenIdsMaker:
         if seqlen_a == seqlen_b:
             if np.all(input_ids_a == input_ids_b):
                 return None
-        a_ids = np.asarray(a_ids,dtype=np.int32)
-        pos_a = cls.get_prompt_length(a_ids,input_ids_a)
-        pos_b = cls.get_prompt_length(a_ids,input_ids_b)
-        assert pos_a >= 0 and pos_a < max_seq_length -1 and pos_b >= 0 and pos_b < max_seq_length -1
-        labels = np.asarray([-100] * pos_a + input_ids_a[pos_a:].tolist(),dtype=np.int64)
-        labels2 = np.asarray([-100] * pos_b + input_ids_b[pos_b:].tolist(),dtype=np.int64)
+
+        pos_a = len(a_ids1) + len(sptoken)
+        pos_b = len(a_ids2) + len(sptoken)
+        assert pos_a >= 0 and pos_a < max_seq_length - 1 and pos_b >= 0 and pos_b < max_seq_length - 1
+        labels = np.asarray([-100] * pos_a + input_ids_a[pos_a:].tolist(), dtype=np.int64)
+        labels2 = np.asarray([-100] * pos_b + input_ids_b[pos_b:].tolist(), dtype=np.int64)
         return {
             "input_ids": input_ids_a,
             "attention_mask": attention_mask_a,
@@ -90,23 +96,10 @@ class TokenIdsMaker:
 
 
 
-class TokenIdsMakerForchatglm:
-    @classmethod
-    def trunction_ids(cls,a_ids: typing.List,b_ids: typing.List,max_seq_length,mode='left',a_min_length=10):
-        assert a_min_length < max_seq_length
-        a_len = max(a_min_length,max_seq_length - len(b_ids))
-        ids = a_ids[:a_len] + b_ids if mode == 'left' else a_ids + b_ids
-        return ids[:max_seq_length]
-    @classmethod
-    def get_prompt_length(cls,a_ids,b_ids):
-        l = min(len(a_ids), len(b_ids))
-        mask: np.ndarray = a_ids[:l] == b_ids[:l]
-        if mask.all():
-            return l
-        return mask.tolist().index(0)
 
+class TokenIdsMakerForGLM(TokenIdsMaker):
     @classmethod
-    def process(cls,pair_data,tokenizer: PreTrainedTokenizer,max_seq_length: int):
+    def process(cls,pair_data,tokenizer: PreTrainedTokenizer,sptoken, max_seq_length: int,src_max_length,dst_max_length):
         prompt, chosen, rejected = pair_data
 
 
@@ -114,13 +107,23 @@ class TokenIdsMakerForchatglm:
         b_ids1 = tokenizer.encode(chosen, truncation=True, max_length=max_seq_length,add_special_tokens=False)
         b_ids2 = tokenizer.encode(rejected, truncation=True, max_length=max_seq_length,add_special_tokens=False)
 
-        input_ids_a = np.asarray(cls.trunction_ids(a_ids,b_ids1,max_seq_length-1,mode="left",a_min_length=10) + [tokenizer.eos_token_id] ,
-                                 dtype=np.int32)
-        attention_mask_a = np.asarray([1] * len(input_ids_a),dtype=np.int32)
+        if src_max_length is not None and src_max_length > 0:
+            a_ids = a_ids[:src_max_length]
 
-        input_ids_b = np.asarray(cls.trunction_ids(a_ids,b_ids2,max_seq_length-1,mode="left",a_min_length=10) + [tokenizer.eos_token_id] ,
-                                 dtype=np.int32)
-        attention_mask_b = np.asarray([1] * len(input_ids_b),dtype=np.int32)
+        if dst_max_length is not None and dst_max_length > 0:
+            b_ids1 = b_ids1[:dst_max_length]
+            b_ids2 = b_ids2[:dst_max_length]
+
+        a_ids1 = copy.deepcopy(a_ids)
+        cls.trunction_ids(a_ids1,b_ids1,max_seq_length,sptoken)
+
+        a_ids2 = copy.deepcopy(a_ids)
+        cls.trunction_ids(a_ids2, b_ids2,max_seq_length,sptoken)
+
+
+        input_ids_a = np.asarray( a_ids1 + sptoken + b_ids1 + [tokenizer.eos_token_id] ,dtype=np.int32)
+        input_ids_b = np.asarray( a_ids2 + sptoken + b_ids2 + [tokenizer.eos_token_id] ,dtype=np.int32)
+
 
         seqlen_a = len(input_ids_a)
         seqlen_b = len(input_ids_b)
@@ -128,19 +131,78 @@ class TokenIdsMakerForchatglm:
         if seqlen_a == seqlen_b:
             if np.all(input_ids_a == input_ids_b):
                 return None
-        a_ids = np.asarray(a_ids,dtype=np.int32)
-        pos_a = cls.get_prompt_length(a_ids,input_ids_a)
-        pos_b = cls.get_prompt_length(a_ids,input_ids_b)
+
+        pos_a = len(a_ids1)
+        pos_b = len(a_ids2)
         assert pos_a >= 0 and pos_a < max_seq_length -1 and pos_b >= 0 and pos_b < max_seq_length -1
         labels = np.asarray([-100] * pos_a + input_ids_a[pos_a:].tolist(),dtype=np.int64)
         labels2 = np.asarray([-100] * pos_b + input_ids_b[pos_b:].tolist(),dtype=np.int64)
+
+        ctxlen = pos_a + len(sptoken) - 1
+        ctxlen2 = pos_b + len(sptoken) - 1
+
+        ctxlen = np.asarray(ctxlen,dtype=np.int32)
+        ctxlen2 = np.asarray(ctxlen2, dtype=np.int32)
         return {
             "input_ids": input_ids_a,
-            "attention_mask": attention_mask_a,
+            "ctxlen": ctxlen,
             "labels": labels,
             # "seqlen": np.asarray(seqlen_a,dtype=np.int32),
             "input_ids2": input_ids_b,
-            "attention_mask2": attention_mask_b,
+            "ctxlen2": ctxlen2,
+            "labels2": labels2,
+            # "seqlen2": np.asarray(seqlen_b, dtype=np.int32),
+        }
+
+
+class TokenIdsMakerForGLM2(TokenIdsMaker):
+
+    @classmethod
+    def process(cls,pair_data,tokenizer: PreTrainedTokenizer,sptoken, max_seq_length: int,src_max_length,dst_max_length):
+        prompt, chosen, rejected = pair_data
+
+
+        a_ids = tokenizer.encode(prompt, truncation=True, max_length=max_seq_length,add_special_tokens=False)
+        b_ids1 = tokenizer.encode(chosen, truncation=True, max_length=max_seq_length,add_special_tokens=False)
+        b_ids2 = tokenizer.encode(rejected, truncation=True, max_length=max_seq_length,add_special_tokens=False)
+
+        if src_max_length is not None and src_max_length > 0:
+            a_ids = a_ids[:src_max_length]
+
+        if dst_max_length is not None and dst_max_length > 0:
+            b_ids1 = b_ids1[:dst_max_length]
+            b_ids2 = b_ids2[:dst_max_length]
+
+        a_ids1 = copy.deepcopy(a_ids)
+        cls.trunction_ids(a_ids1,b_ids1,max_seq_length,sptoken)
+
+        a_ids2 = copy.deepcopy(a_ids)
+        cls.trunction_ids(a_ids2, b_ids2,max_seq_length,sptoken)
+
+
+        input_ids_a = np.asarray( sptoken + a_ids1 + b_ids1 + [tokenizer.eos_token_id] ,dtype=np.int32)
+        input_ids_b = np.asarray( sptoken + a_ids2 + b_ids2 + [tokenizer.eos_token_id] ,dtype=np.int32)
+
+
+        seqlen_a = len(input_ids_a) + len(sptoken)
+        seqlen_b = len(input_ids_b) + len(sptoken)
+
+        if seqlen_a == seqlen_b:
+            if np.all(input_ids_a == input_ids_b):
+                return None
+
+        pos_a = len(a_ids1)
+        pos_b = len(a_ids2)
+        assert pos_a >= 0 and pos_a < max_seq_length -1 and pos_b >= 0 and pos_b < max_seq_length -1
+        labels = np.asarray([-100] * pos_a + input_ids_a[pos_a:].tolist(),dtype=np.int64)
+        labels2 = np.asarray([-100] * pos_b + input_ids_b[pos_b:].tolist(),dtype=np.int64)
+
+
+        return {
+            "input_ids": input_ids_a,
+            "labels": labels,
+            # "seqlen": np.asarray(seqlen_a,dtype=np.int32),
+            "input_ids2": input_ids_b,
             "labels2": labels2,
             # "seqlen2": np.asarray(seqlen_b, dtype=np.int32),
         }

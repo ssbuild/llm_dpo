@@ -19,7 +19,7 @@ from module_setup import global_model_card
 
 assert global_args["trainer_backend"] == "pl"
 
-if __name__ == '__main__':
+def main():
     parser = HfArgumentParser((ModelArguments, TrainingArguments, DataArguments, PetlArguments))
     model_args, training_args, data_args, lora_args = parser.parse_dict(train_info_args)
     lora_args = lora_args.config
@@ -130,3 +130,12 @@ if __name__ == '__main__':
 
     if train_datasets is not None:
         trainer.fit(pl_model, train_dataloaders=train_datasets)
+
+
+def _mp_fn(index):
+    # For xla_spawn (TPUs)
+    main()
+
+
+if __name__ == "__main__":
+    main()

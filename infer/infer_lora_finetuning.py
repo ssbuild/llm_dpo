@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/5/17 11:36
 import sys
-from aigc_zoo.utils.llm_generate import Generate
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),'..')))
+
+from aigc_zoo.utils.llm_generate import Generate
 import torch
 from deep_training.data_helper import ModelArguments, DataArguments
 from transformers import HfArgumentParser,AutoConfig,PreTrainedTokenizer
@@ -18,7 +20,7 @@ if __name__ == '__main__':
     dataHelper = NN_DataHelper(model_args)
     tokenizer, _, _, _ = dataHelper.load_tokenizer_and_config()
 
-    ckpt_dir = './best_ckpt'
+    ckpt_dir = '../scripts/best_ckpt/last'
     config = AutoConfig.from_pretrained(ckpt_dir)
     lora_args = PetlArguments.from_pretrained(ckpt_dir)
 

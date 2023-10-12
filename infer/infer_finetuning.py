@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 # @Time    : 2023/5/17 11:36
 import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__),'..')))
+
 from aigc_zoo.utils.llm_generate import Generate
 from config import get_deepspeed_config
 import torch

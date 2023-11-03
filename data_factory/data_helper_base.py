@@ -2,10 +2,13 @@
 # @Author  : ssbuild
 # @Time    : 2023/9/22 9:03
 import copy
+import glob
 import json
 import os
 import random
 import typing
+from functools import cache
+
 import numpy as np
 import torch
 from deep_training.data_helper import DataHelper
@@ -94,6 +97,7 @@ class NN_DataHelper_Base(DataHelper):
     def on_get_corpus(self, files: typing.List, mode: str):
         tokenizer = self.tokenizer
         D = []
+        files = sum([glob.glob(file) for file in files], [])
         for file in files:
             with open(file, mode='r', encoding='utf-8', newline='\n') as f:
                 lines = f.readlines()
@@ -131,3 +135,28 @@ class NN_DataHelper_Base(DataHelper):
             self.make_dataset_with_args(data_args.eval_file, mode='eval', schema=schema)
         if data_args.do_test:
             self.make_dataset_with_args(data_args.test_file, mode='test', schema=schema)
+
+        # 记录缓存文件
+        with open(os.path.join(data_args.output_dir, 'intermediate_file_index.json'), mode='w',
+                  encoding='utf-8') as f:
+            f.write(json.dumps({
+                "train_files": self.train_files,
+                "eval_files": self.eval_files,
+                "test_files": self.test_files,
+            }, ensure_ascii=False))
+
+    @cache
+    def load_dataset_files(self):
+        data_args = self.data_args
+
+        if not data_args.convert_file:
+            return {
+                "train_files": self.train_files,
+                "eval_files": self.eval_files,
+                "test_files": self.test_files,
+            }
+
+        filename = os.path.join(data_args.output_dir, 'intermediate_file_index.json')
+        assert os.path.exists(filename), 'make you dataset firstly'
+        with open(filename, mode='r', encoding='utf-8') as f:
+            return json.loads(f.read())

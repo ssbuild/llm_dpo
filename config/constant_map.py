@@ -73,6 +73,25 @@ MODELS_MAP = {
         'model_type': 'internlm',
         'model_name_or_path': '/data/nlp/pre_models/torch/internlm/internlm-chat-7b-8k',
     },
+    'Skywork-13B-base': {
+        'model_type': 'skywork',
+        'model_name_or_path': '/data/nlp/pre_models/torch/skywork/Skywork-13B-base',
+    },
+
+    'Yi-6B': {
+        'model_type': 'Yi',
+        'model_name_or_path': '/data/nlp/pre_models/torch/yi/Yi-6B',
+    },
+
+    'Yi-34B': {
+        'model_type': 'Yi',
+        'model_name_or_path': '/data/nlp/pre_models/torch/yi/Yi-34B',
+    },
+
+    'zephyr-7b-beta': {
+        'model_type': 'mistral',
+        'model_name_or_path': '/data/nlp/pre_models/torch/mistral/mistral-7b-sft-beta',
+    },
 }
 
 
@@ -82,4 +101,3 @@ MODELS_MAP = {
 # TRANSFORMERS_MODELS_TO_IA3_TARGET_MODULES_MAPPING
 # TRANSFORMERS_MODELS_TO_IA3_FEEDFORWARD_MODULES_MAPPING
 
-train_model_config = train_info_models['opt-350m']

@@ -119,6 +119,40 @@ def module_setup():
         register_transformer_config(MossConfig)
         register_transformer_model(LM_MODEL, AutoModelForCausalLM)
         register_transformer_tokenizer(MossConfig, MossTokenizer, MossTokenizer)
+
+
+    elif "skywork" in global_model_card:
+        from aigc_zoo.model_zoo.skywork.llm_model import (MySkyworkForCausalLM as LM_MODEL,
+                                                            PetlArguments,  # noqa
+                                                            LoraConfig, PetlModel,
+                                                            PromptArguments,
+                                                            SkyworkConfig, SkyworkTokenizer)
+
+        register_transformer_config(SkyworkConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(SkyworkConfig,SkyworkTokenizer,SkyworkTokenizer)
+
+    elif "bluelm" in global_model_card:
+        from aigc_zoo.model_zoo.bluelm.llm_model import (MyBlueLMForCausalLM as LM_MODEL,
+                                                          PetlArguments,  # noqa
+                                                          LoraConfig, PetlModel,
+                                                          PromptArguments,
+                                                          BlueLMConfig, BlueLMTokenizer)
+
+        register_transformer_config(BlueLMConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(BlueLMConfig, BlueLMTokenizer, BlueLMTokenizer)
+
+    elif "yi" in global_model_card:
+        from aigc_zoo.model_zoo.yi.llm_model import (MyYiForCausalLM as LM_MODEL,
+                                                         PetlArguments,  # noqa
+                                                         LoraConfig, PetlModel,
+                                                         PromptArguments,
+                                                         YiConfig, YiTokenizer)
+
+        register_transformer_config(YiConfig)
+        register_transformer_model(LM_MODEL, AutoModelForCausalLM)
+        register_transformer_tokenizer(YiConfig, YiTokenizer, YiTokenizer)
     elif "rwkv" in global_model_card:
         from aigc_zoo.model_zoo.rwkv4.llm_model import (MyRwkvForCausalLM as LM_MODEL,
                                                        PetlArguments,  # noqa

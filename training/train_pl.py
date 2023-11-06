@@ -67,10 +67,12 @@ def main():
         dirpath=output_weight_dir,
         save_weights_only=True,
         save_last=True,
-        save_top_k=1,
         # every_n_train_steps=2000 // training_args.gradient_accumulation_steps,
         every_n_epochs=1,
         lora_args=lora_args,
+        # monitor="loss",mode = "min", save_top_k = 10 按loss存储10个模型
+        monitor="step", mode="max",
+        save_top_k=10,  # 按步存储最后10个模型
     )
 
 
@@ -120,7 +122,7 @@ def main():
 
 
     train_datasets = dataHelper.load_distributed_random_sampler(
-        dataHelper.train_files,
+        dataHelper.load_dataset_files()["train_files"],
         with_load_memory=True,
         collate_fn=dataHelper.collate_fn,
         batch_size=training_args.train_batch_size,

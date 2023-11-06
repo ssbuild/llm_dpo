@@ -9,17 +9,26 @@ export train_config=${train_config}
 export enable_deepspeed=false
 export enable_ptv2=false
 export enable_lora=true
-export load_in_bit=4
+export load_in_bit=0
+
+# export CUDA_VISIBLE_DEVICES=0,1,2,3
+
+usage() { echo "Usage: $0 [-m <train|dataset>]" 1>&2; exit 1; }
 
 
-mode="train"
 while getopts m: opt
 do
 	case "${opt}" in
 		m) mode=${OPTARG};;
+    *)
+      usage
+      ;;
 	esac
 done
 
+if [ "${mode}" != "dataset" ]  && [ "${mode}" != "train" ] ; then
+    usage
+fi
 
 if [[ "${mode}" == "dataset" ]] ; then
     python ../data_utils.py
